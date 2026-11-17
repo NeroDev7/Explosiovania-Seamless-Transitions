@@ -50,9 +50,17 @@ If you want to keep Direct3D 12, delete the two `rendering_device/...` lines in 
 - The transition into the Saint Passways boss fight uses the normal loading screen on purpose.
 - Walking back into a gate right after arriving: the region you came from has to be built again first, so you get a short white fade, like in the base game.
 
-## Other mods
+## Mod loader (for other mods)
 
-The mod loader in `mods/mod_loader.gd` loads every `mods/<name>/mod_main.gd`. If another mod also ships an `override.cfg`, the two files need to be merged by hand: keep one `[autoload]` section with both entries.
+The mod ships with a small general mod loader (`mods/mod_loader.gd`), started by `override.cfg`. Other Explosiovania mods can use it too:
+
+- Put your mod in `mods/<your_mod>/mod_main.gd`, a script that `extends Node`. Each one is added as a child node of the loader at startup, in alphabetical folder order, before the first scene loads.
+- Folders starting with `_` or `.` are skipped: rename a folder to `_my_mod` to disable it.
+- Loose `.gd` files work: `res://mods/...` falls back to the files next to the game, so nothing has to be packed.
+- To change a game script without touching `Explosiovania.pck`, write an extension (`extends "res://path/original.gd"`), load it in your mod's `_init` and call `take_over_path("res://path/original.gd")` on it before scenes using it load. Seamless Transitions does this for stage gates, levers and a few others; see `mods/seamless_transitions/mod_main.gd`. Scripts that other scripts extend by `class_name` can't be replaced this way.
+- Two mods that replace the same game script will conflict.
+
+If another mod ships its own `override.cfg`, the two files need to be merged by hand: keep one `[autoload]` section with both entries.
 
 ## How it works (short)
 
